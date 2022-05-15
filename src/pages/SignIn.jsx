@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import { FaRegCommentDots } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebase.config';
 
 const SignIn = () => {
-  const [fromData, setFormData] = useState({
+  const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
 
-  const { email, password } = fromData;
+  const { email, password } = formData;
+
+  const navigate = useNavigate();
 
   const onChange = (e) => {
     const newData = {
@@ -23,20 +27,28 @@ const SignIn = () => {
     });
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
 
-    console.log(fromData);
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
+      if (userCredential.user) {
+        navigate('/');
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
-    <div className="px-5 my-12 text-center">
-      <div className="text-moderate_blue text-6xl mb-6 max-w-fit mx-auto">
+    <div className="px-5 my-12 text-center md:max-w-2xl md:mx-auto">
+      <div className="mx-auto mb-6 text-6xl text-moderate_blue max-w-fit">
         <FaRegCommentDots />
       </div>
-      <h1 className="font-bold text-3xl mb-4">Welcome Back!</h1>
-      <div className="bg-very_light_gray py-6 w-full px-4 shadow-lg rounded-md">
-        <h3 className="text-left mb-4 font-medium text-2xl">Login</h3>
+      <h1 className="mb-4 text-3xl font-bold">Welcome Back!</h1>
+      <div className="w-full px-4 py-6 rounded-md shadow-lg bg-very_light_gray">
+        <h3 className="mb-4 text-2xl font-medium text-left">Login</h3>
         <form onSubmit={onSubmit} className="w-full">
           <div className="mt-3">
             <input
@@ -46,7 +58,7 @@ const SignIn = () => {
               value={email}
               onChange={onChange}
               autoComplete="off"
-              className="w-full bg-transparent pl-4 py-2 pb-3 border-b caret-moderate_blue border-dark_blue outline-0 placeholder-grayish_blue"
+              className="w-full py-2 pb-3 pl-4 bg-transparent border-b caret-moderate_blue border-dark_blue outline-0 placeholder-grayish_blue"
               placeholder="Enter your email"
             />
           </div>
@@ -58,20 +70,20 @@ const SignIn = () => {
               id="password"
               onChange={onChange}
               autoComplete="off"
-              className="w-full bg-transparent pl-4 py-2 pb-3 border-b caret-moderate_blue border-dark_blue outline-0 placeholder-grayish_blue"
+              className="w-full py-2 pb-3 pl-4 bg-transparent border-b caret-moderate_blue border-dark_blue outline-0 placeholder-grayish_blue"
               placeholder="Enter your password"
             />
           </div>
           <button
             type="submit"
-            className="mt-6 py-2 text-center w-full bg-moderate_blue text-white font-medium rounded-md shadow-lg hover:bg-light_grayish_blue hover:text-dark_blue hover:scale-95"
+            className="w-full py-2 mt-6 font-medium text-center text-white rounded-md shadow-lg md:max-w-xs bg-moderate_blue hover:bg-light_grayish_blue hover:text-dark_blue hover:scale-95"
           >
             Login to your account
           </button>
         </form>
         <div className="mt-6 ">
           <p className="mb-2">Don't have an account?</p>
-          <Link to="/sign-up" className="text-moderate_blue font-semibold">
+          <Link to="/sign-up" className="font-semibold text-moderate_blue">
             Create One
           </Link>
         </div>

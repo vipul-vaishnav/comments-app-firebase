@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
 import { FaRegCommentDots } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { auth, db } from '../firebase.config';
 
 const SignUp = () => {
-  const [fromData, setFormData] = useState({
+  const [formData, setFormData] = useState({
     email: '',
     password: '',
     name: '',
   });
 
-  const { email, password, name } = fromData;
+  const { email, password, name } = formData;
+
+  const navigate = useNavigate();
 
   const onChange = (e) => {
     const newData = {
@@ -24,19 +29,34 @@ const SignUp = () => {
     });
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
+    try {
+      const userCredential = createUserWithEmailAndPassword(auth, email, password);
 
-    console.log(fromData);
+      const user = userCredential.user;
+
+      // updateProfile(auth.currentUser, {
+      //   displayName: name,
+      // });
+
+      // const formDataCopy = { ...formData };
+      // delete formDataCopy.password;
+      // formDataCopy.created_at = serverTimestamp();
+
+      navigate('/');
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
-    <div className="px-5 my-12 text-center">
-      <div className="text-moderate_blue text-6xl mb-6 max-w-fit mx-auto">
+    <div className="px-5 my-12 text-center md:max-w-2xl md:mx-auto">
+      <div className="mx-auto mb-6 text-6xl text-moderate_blue max-w-fit">
         <FaRegCommentDots />
       </div>
-      <h1 className="font-bold text-3xl mb-4">Welcome!</h1>
-      <div className="bg-very_light_gray py-6 w-full px-4 shadow-lg rounded-md">
-        <h3 className="text-left mb-4 font-medium text-2xl">Create a new account</h3>
+      <h1 className="mb-4 text-3xl font-bold">Welcome!</h1>
+      <div className="w-full px-4 py-6 rounded-md shadow-lg bg-very_light_gray">
+        <h3 className="mb-4 text-2xl font-medium text-left">Create a new account</h3>
         <form onSubmit={onSubmit} className="w-full">
           <div className="mt-3">
             <input
@@ -46,7 +66,7 @@ const SignUp = () => {
               value={name}
               onChange={onChange}
               autoComplete="off"
-              className="w-full bg-transparent pl-4 py-2 pb-3 border-b caret-moderate_blue border-dark_blue outline-0 placeholder-grayish_blue"
+              className="w-full py-2 pb-3 pl-4 bg-transparent border-b caret-moderate_blue border-dark_blue outline-0 placeholder-grayish_blue"
               placeholder="Enter your name"
             />
           </div>
@@ -58,7 +78,7 @@ const SignUp = () => {
               value={email}
               onChange={onChange}
               autoComplete="off"
-              className="w-full bg-transparent pl-4 py-2 pb-3 border-b caret-moderate_blue border-dark_blue outline-0 placeholder-grayish_blue"
+              className="w-full py-2 pb-3 pl-4 bg-transparent border-b caret-moderate_blue border-dark_blue outline-0 placeholder-grayish_blue"
               placeholder="Enter your email"
             />
           </div>
@@ -70,20 +90,20 @@ const SignUp = () => {
               id="password"
               onChange={onChange}
               autoComplete="off"
-              className="w-full bg-transparent pl-4 py-2 pb-3 border-b caret-moderate_blue border-dark_blue outline-0 placeholder-grayish_blue"
+              className="w-full py-2 pb-3 pl-4 bg-transparent border-b caret-moderate_blue border-dark_blue outline-0 placeholder-grayish_blue"
               placeholder="Enter your password"
             />
           </div>
           <button
             type="submit"
-            className="mt-6 py-2 text-center w-full bg-moderate_blue text-white font-medium rounded-md shadow-lg hover:bg-light_grayish_blue hover:text-dark_blue hover:scale-95"
+            className="w-full py-2 mt-6 font-medium text-center text-white rounded-md shadow-lg md:max-w-sm bg-moderate_blue hover:bg-light_grayish_blue hover:text-dark_blue hover:scale-95"
           >
             Create your new account
           </button>
         </form>
         <div className="mt-6 ">
           <p className="mb-2">Already have an account?</p>
-          <Link to="/sign-in" className="text-moderate_blue font-semibold">
+          <Link to="/sign-in" className="font-semibold text-moderate_blue">
             Log In
           </Link>
         </div>
